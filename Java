@@ -1,0 +1,279 @@
+package com.example.tictactoeapp;
+
+import androidx.appcompat.app.AppCompatActivity;
+
+import android.content.Context;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
+import android.widget.Toast;
+
+
+public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+
+    Button[][] grid = new Button[3][3];
+    //For toasts:
+    String text = "";
+    int duration = Toast.LENGTH_SHORT;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        //first row:
+        grid[0][0] = (Button)this.findViewById(R.id.button1);
+        grid[0][0].setOnClickListener(this);
+        grid[0][1] = (Button)this.findViewById(R.id.button2);
+        grid[0][1].setOnClickListener(this);
+        grid[0][2] = (Button)this.findViewById(R.id.button3);
+        grid[0][2].setOnClickListener(this);
+        //second row:
+        grid[1][0] = (Button)this.findViewById(R.id.button4);
+        grid[1][0].setOnClickListener(this);
+        grid[1][1] = (Button)this.findViewById(R.id.button5);
+        grid[1][1].setOnClickListener(this);
+        grid[1][2] = (Button)this.findViewById(R.id.button6);
+        grid[1][2].setOnClickListener(this);
+        //third row:
+        grid[2][0] = (Button)this.findViewById(R.id.button7);
+        grid[2][0].setOnClickListener(this);
+        grid[2][1] = (Button)this.findViewById(R.id.button8);
+        grid[2][1].setOnClickListener(this);
+        grid[2][2] = (Button)this.findViewById(R.id.button9);
+        grid[2][2].setOnClickListener(this);
+
+
+
+
+
+    }
+
+    public void toastMaker(String name, String txt){
+        Toast.makeText(this, txt, duration).show();
+
+    }
+
+    @Override
+    public void onClick(View view) { //when a button is clicked
+
+        Button b = (Button)view;
+        if(b.isEnabled()) {//Only input a new X or O if it is empty
+            b.setText("X");
+            b.setEnabled(false);
+
+            //check for X win
+            if (checkWin("X")) {
+                toastMaker("xWin", "X won!");
+                clearBoard();
+            }
+            //if there is no tie or win after X goes, have O go
+            if(!checkTie()) {
+                compDetermineMove().setText("O");
+                for(int x = 0; x < 3; x++){
+                    for(int y = 0; y < 3 ; y++){
+                        if(!grid[x][y].getText().equals("")){
+                            grid[x][y].setEnabled(false);
+                        }
+                    }
+                }
+                //if O wins
+                if(checkWin("O")){
+                    toastMaker("oWin", "O won!");
+                    clearBoard();
+                }
+            }
+        }
+        //check for tie
+        if(checkTie()){
+           toastMaker("tie", "It is a tie!");
+            clearBoard();
+        }
+
+    }
+
+    public Button compDetermineMove() {
+        int xCount = 0;
+        int blankCount = 0;
+        int emptySpotCol = 0;
+        int emptySpotRow = 0;
+
+        //check each row: use counting method
+        for(int y = 0; y < 3; y++) {
+
+            for (int x = 0; x < 3; x++) {//iterate each thing in row
+
+                if (grid[y][x].getText().equals("")) {
+                    blankCount++;
+                } else if (grid[y][x].getText().equals("X")) {
+                    xCount++;
+                }
+                if (xCount == 2 && blankCount == 1) {
+                    for (int i = 0; i < 3; i++) {
+                        if (grid[y][i].getText().equals("")) {
+                            return grid[y][i];
+                        }
+                    }
+                }
+            }
+            xCount = 0;
+            blankCount = 0;
+        }
+        //check each column:
+        for(int x = 0; x < 3; x++) {
+
+            for (int y = 0; y < 3; y++) {//iterate each thing in row
+
+                if (grid[y][x].getText().equals("")) {
+                    blankCount++;
+                } else if (grid[y][x].getText().equals("X")) {
+                    xCount++;
+                }
+                if (xCount == 2 && blankCount == 1) {
+                    for (int i = 0; i < 3; i++) {
+                        if (grid[i][x].getText().equals("")) {
+                            return grid[i][x];
+                        }
+                    }
+                }
+            }
+            xCount = 0;
+            blankCount = 0;
+        }
+
+        //check diagonal left to right:
+        xCount = 0;
+        blankCount = 0;
+        if(grid[0][0].getText().equals("X")){
+            xCount++;
+        }else if(grid[0][0].getText().equals("")){
+            blankCount++;
+            emptySpotCol = 0;
+            emptySpotRow = 0;
+        }
+        if(grid[1][1].getText().equals("X")){
+            xCount++;
+        }else if(grid[1][1].getText().equals("")){
+            blankCount++;
+            emptySpotCol = 1;
+            emptySpotRow = 1;
+        }
+        if(grid[2][2].getText().equals("X")){
+            xCount++;
+        }else if(grid[2][2].getText().equals("")){
+            blankCount++;
+            emptySpotCol = 2;
+            emptySpotRow = 2;
+
+        }
+        if(xCount == 2 && blankCount == 1){
+            return grid[emptySpotCol][emptySpotRow];
+        }
+
+        //check diagonal from right to left:
+        xCount = 0;
+        blankCount = 0;
+        if(grid[2][0].getText().equals("X")){
+            xCount++;
+        }else if(grid[2][0].getText().equals("")){
+            blankCount++;
+            emptySpotCol = 2;
+            emptySpotRow = 0;
+        }
+        if(grid[1][1].getText().equals("X")){
+            xCount++;
+        }else if(grid[1][1].getText().equals("")){
+            blankCount++;
+            emptySpotCol = 1;
+            emptySpotRow = 1;
+        }
+        if(grid[0][2].getText().equals("X")){
+            xCount++;
+        }else if(grid[0][2].getText().equals("")){
+            blankCount++;
+            emptySpotCol = 0;
+            emptySpotRow = 2;
+
+        }
+        if(xCount == 2 && blankCount == 1){
+            return grid[emptySpotCol][emptySpotRow];
+        }
+
+
+        //randomly choose:
+        /*
+         * I used code from Geeks for Geeks
+         * URL: https://www.geeksforgeeks.org/java-math-random-method-examples/
+         * I used this code to generate a random number between 0 and 2.
+         */
+        for(int i = 0; i < 100; i++){
+            emptySpotCol = (int) (Math.random() * 2) + 0;
+            emptySpotRow = (int) (Math.random() * 2) + 0;
+            if(grid[emptySpotCol][emptySpotRow].getText().equals("")) {
+                break;
+            }
+            if(i == 99){
+                System.out.println("Couldn't make a move");
+            }
+        }
+        return grid[emptySpotCol][emptySpotRow];
+    }
+
+
+
+
+
+
+    public void clearBoard(){
+        for(int x = 0; x < 3; x++) {
+            for (int y = 0; y < 3; y++) {
+                grid[x][y].setText("");
+                grid[x][y].setEnabled(true);
+            }
+        }
+
+    }
+
+
+
+    public Boolean checkTie(){
+        int markedButtons = 0;
+        for(int x = 0; x < 3; x++){
+            for(int y = 0; y < 3; y++){
+                if(!grid[x][y].getText().toString().equals("")){
+                    markedButtons++;
+                }
+            }
+        }
+        if(markedButtons >= 9){
+            return true;
+        }else return false;
+    }
+
+    public Boolean checkWin(String player){
+        if(grid[0][0].getText().equals(player) &&
+                grid[1][1].getText().equals(player) &&
+                grid[2][2].getText().equals(player)) return true;//Diagonal down from left to right
+        else if(grid[0][0].getText().equals(player) &&
+                grid[0][1].getText().equals(player) &&
+                grid[0][2].getText().equals(player)) return true;//Across top row
+        else if(grid[0][0].getText().equals(player) &&
+                grid[1][0].getText().equals(player) &&
+                grid[2][0].getText().equals(player)) return true;//Down left column
+        else if(grid[0][1].getText().equals(player) &&
+                grid[1][1].getText().equals(player) &&
+                grid[2][1].getText().equals(player)) return true;//Across middle column
+        else if(grid[0][2].getText().equals(player) &&
+                grid[1][2].getText().equals(player) &&
+                grid[2][2].getText().equals(player)) return true;//Across bottom row
+        else if(grid[1][0].getText().equals(player) &&
+                grid[1][1].getText().equals(player) &&
+                grid[1][2].getText().equals(player)) return true;//Down middle column
+        else if(grid[2][0].getText().equals(player) &&
+                grid[2][1].getText().equals(player) &&
+                grid[2][2].getText().equals(player)) return true;//Down right column
+        else if(grid[2][0].getText().equals(player) &&
+                grid[1][1].getText().equals(player) &&
+                grid[0][2].getText().equals(player)) return true;//Diagonal up from left to right
+        else return false; //if no one has won yet)
+    }
+}
